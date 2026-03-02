@@ -88,7 +88,7 @@ def create_features(df):
     return data
 
 
-def fetch_stock_data(ticker, days=730):
+def fetch_stock_data(ticker, days=365):
     """Fetch stock data with error handling"""
     try:
         end_date = datetime.now()
@@ -168,7 +168,18 @@ def get_current_price(ticker):
 def build_and_train_model(X_train, y_train):
     """Build and train enhanced LSTM model"""
     model = Sequential([
-        Bidirectional(LSTM(100, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2]))),
+        LSTM(50, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2])),
+        Dropout(0.2),
+        
+        # Removed middle layer, kept only 2 LSTM layers
+        LSTM(30, return_sequences=False),  # Reduced from 80
+        Dropout(0.2),
+        
+        # Simplified dense layers
+        Dense(25, activation='relu'),
+        Dense(1)
+        
+        """Bidirectional(LSTM(50, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2]))),
         Dropout(0.3),
         Bidirectional(LSTM(80, return_sequences=True)),
         Dropout(0.3),
@@ -176,17 +187,17 @@ def build_and_train_model(X_train, y_train):
         Dropout(0.2),
         Dense(50, activation='relu'),
         Dense(25, activation='relu'),
-        Dense(1)
+        Dense(1)"""
     ])
     
     model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
     
-    early_stop = EarlyStopping(monitor='loss', patience=5, restore_best_weights=True)
+    early_stop = EarlyStopping(monitor='loss', patience=3, restore_best_weights=True) #patience=5
     
     history = model.fit(
         X_train, y_train,
         batch_size=32,
-        epochs=50,
+        epochs=30,
         validation_split=0.1,
         callbacks=[early_stop],
         verbose=0
@@ -321,7 +332,7 @@ def predict():
         scaled_target = scaler_target.fit_transform(target.reshape(-1, 1))
         
         # Create sequences
-        sequence_length = 60
+        sequence_length = 30
         X, y = [], []
         
         for i in range(sequence_length, len(scaled_features)):
@@ -450,4 +461,5 @@ if __name__ == '__main__':
     print("\n📊 Starting Flask server...")
     print("🌐 Open your browser and go to: http://localhost:5000")
     print("="*70 + "\n")
+
     app.run(debug=True, host='0.0.0.0', port=5000)
