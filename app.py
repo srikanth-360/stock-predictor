@@ -89,7 +89,7 @@ def create_features(df):
     return data
 
 
-def fetch_stock_data(ticker, days=365):
+def fetch_stock_data(ticker, days=180):
     """Fetch stock data with error handling"""
     try:
         end_date = datetime.now()
@@ -453,5 +453,6 @@ if __name__ == '__main__':
 
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
