@@ -178,16 +178,6 @@ def build_and_train_model(X_train, y_train):
         # Simplified dense layers
         Dense(25, activation='relu'),
         Dense(1)
-        
-        """Bidirectional(LSTM(50, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2]))),
-        Dropout(0.3),
-        Bidirectional(LSTM(80, return_sequences=True)),
-        Dropout(0.3),
-        LSTM(60, return_sequences=False),
-        Dropout(0.2),
-        Dense(50, activation='relu'),
-        Dense(25, activation='relu'),
-        Dense(1)"""
     ])
     
     model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
@@ -463,3 +453,4 @@ if __name__ == '__main__':
     print("="*70 + "\n")
 
     app.run(debug=True, host='0.0.0.0', port=5000)
+
