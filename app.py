@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import os
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, Bidirectional
@@ -167,23 +168,22 @@ def get_current_price(ticker):
 
 def build_and_train_model(X_train, y_train):
     """Build and train enhanced LSTM model"""
+    
     model = Sequential([
         LSTM(50, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2])),
         Dropout(0.2),
-        
-        # Removed middle layer, kept only 2 LSTM layers
-        LSTM(30, return_sequences=False),  # Reduced from 80
+
+        LSTM(30, return_sequences=False),
         Dropout(0.2),
-        
-        # Simplified dense layers
+
         Dense(25, activation='relu'),
         Dense(1)
     ])
-    
+
     model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
-    
-    early_stop = EarlyStopping(monitor='loss', patience=3, restore_best_weights=True) #patience=5
-    
+
+    early_stop = EarlyStopping(monitor='loss', patience=3, restore_best_weights=True)
+
     history = model.fit(
         X_train, y_train,
         batch_size=32,
@@ -192,7 +192,7 @@ def build_and_train_model(X_train, y_train):
         callbacks=[early_stop],
         verbose=0
     )
-    
+
     return model, history
 
 
@@ -449,8 +449,9 @@ if __name__ == '__main__':
     print("🚀 STOCK PREDICTION WEB APPLICATION")
     print("="*70)
     print("\n📊 Starting Flask server...")
-    print("🌐 Open your browser and go to: http://localhost:5000")
     print("="*70 + "\n")
 
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
 
