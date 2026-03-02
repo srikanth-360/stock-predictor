@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Stock Price Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <rect width="40" height="40" rx="8" fill="url(#gradient)"/>
+                    <path d="M12 28V12L20 16L28 12V28L20 24L12 28Z" fill="white"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0" y1="0" x2="40" y2="40">
+                            <stop offset="0%" stop-color="#667eea"/>
+                            <stop offset="100%" stop-color="#764ba2"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <h1>AI Stock Predictor</h1>
+            </div>
+            <nav>
+                <a href="#" class="nav-link active">SRI KANTH N</a>
+               <!-- <a href="#" class="nav-link">About</a>-->
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-card">
+                    <h2>Enter Stock Ticker Symbol</h2>
+                    <p class="subtitle">Get AI-powered price predictions with detailed analysis</p>
+                    
+                    <div class="search-container">
+                        <input 
+                            type="text" 
+                            id="tickerInput" 
+                            placeholder="Enter ticker (e.g., RELIANCE, TCS, INFY, AAPL)" 
+                            class="search-input"
+                        >
+                        <button id="predictBtn" class="btn-primary">
+                            <span class="btn-text">Predict</span>
+                            <span class="loader" style="display: none;"></span>
+                        </button>
+                    </div>
+                    
+                    <div class="popular-stocks">
+                        <span class="label">Popular:</span>
+                        <button class="stock-chip" data-ticker="RELIANCE">Reliance</button>
+                        <button class="stock-chip" data-ticker="TCS">TCS</button>
+                        <button class="stock-chip" data-ticker="INFY">Infosys</button>
+                        <button class="stock-chip" data-ticker="HDFCBANK">HDFC Bank</button>
+                        <button class="stock-chip" data-ticker="AAPL">Apple</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section" style="display: none;">
+                <!-- Company Info -->
+                <div class="company-info-card">
+                    <div class="company-header">
+                        <div>
+                            <h2 id="companyName">Company Name</h2>
+                            <p id="tickerSymbol" class="ticker-symbol">TICKER</p>
+                        </div>
+                        <div class="current-price">
+                            <span class="label">Current Price</span>
+                            <span id="currentPrice" class="price">₹0.00</span>
+                            <span id="priceTimestamp" class="price-timestamp"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prediction Card -->
+                <div class="prediction-card">
+                    <div class="prediction-header">
+                        <h3>Tomorrow's Prediction</h3>
+                        <span id="predictionDate" class="date"></span>
+                    </div>
+                    
+                    <div class="prediction-content">
+                        <div class="predicted-price-section">
+                            <div class="predicted-price-container">
+                                <span class="label">Predicted Price</span>
+                                <div class="price-display">
+                                    <span id="predictedPrice" class="predicted-price">₹0.00</span>
+                                    <span id="priceChange" class="price-change">+₹0.00 (+0.00%)</span>
+                                </div>
+                            </div>
+                            <div id="signalBadge" class="signal-badge bullish">
+                                <span id="signalText">BULLISH</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model Performance -->
+                    <div class="model-performance">
+                        <h4>Model Performance</h4>
+                        <div class="metrics-grid">
+                            <div class="metric">
+                                <span class="metric-label">Accuracy</span>
+                                <span id="accuracy" class="metric-value">0%</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">MAPE</span>
+                                <span id="mape" class="metric-value">0%</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">RMSE</span>
+                                <span id="rmse" class="metric-value">₹0</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">MAE</span>
+                                <span id="mae" class="metric-value">₹0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reasoning Section -->
+                <div class="reasoning-card">
+                    <h3>📊 Prediction Analysis & Reasoning</h3>
+                    <div id="reasoningContent" class="reasoning-content">
+                        <!-- Reasoning items will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-card">
+                        <h3>Price History & Prediction</h3>
+                        <div id="priceChart" class="chart-container"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h3>Technical Indicators</h3>
+                        <div id="technicalChart" class="chart-container"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h3>Model Performance - Actual vs Predicted</h3>
+                        <div id="performanceChart" class="chart-container"></div>
+                    </div>
+
+                    <!-- <div class="chart-card">
+                        <h3>Volume Analysis</h3>
+                        <div id="volumeChart" class="chart-container"></div>
+                    </div>-->
+                </div>
+            </section>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="error-message" style="display: none;">
+                <div class="error-content">
+                    <span class="error-icon">⚠️</span>
+                    <div>
+                        <h4>Error</h4>
+                        <p id="errorText"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>⚠️ <strong>Disclaimer:</strong> This prediction is based on historical data and technical analysis. 
+            Stock market predictions are inherently uncertain. This should NOT be considered as financial advice. 
+            Always do your own research and consult with financial advisors before making investment decisions.</p>
+            <p class="copyright">© 2025 AI Stock Predictor. Powered by LSTM Neural Networks.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
